@@ -1,15 +1,16 @@
 from game import Game
 from utils import ACTIONS
 
-g = Game()
-g.printGrid()
+game = Game()
+game.printGrid()
 
-while(not g.isFinished()):
+while(not game.isFinished()):
     movestr = input()
     if(movestr.upper() in ACTIONS):
         move = ACTIONS[movestr.upper()]
-        g.step(move)
+        game.step(move)
 
-    g.printGrid()
+    game.printGrid()
+    print(game.getState())
 
-print("You Lose!\nScore: {}".format(g.getPoints()))
+print("You Lose!\nScore: {}".format(game.getPoints()))
