@@ -73,15 +73,20 @@ class Game(object):
 
     def getState(self):
         state = []
-        directions = [[-1, 0], [1, 0], [0, -1], [0, 1]] # Up, Down, Left, Right
+        # counter clockwise vision
+        directions = [[-1, 0], [-1, -1], [0, -1], [1, -1], #  up, up-left, left, down-left
+                       [1, 0], [1, 1], [0, 1], [-1, 1]]    # down, down-right, right, up-right
         for dir in directions:
             state.extend(self.vision(dir))
 
         return state
         print(state)
 
-    def getPoints(self):
+    def getReward(self):
         return self.moves + 100*(self.points**2)
+
+    def getPoints(self):
+        return self.points
 
     def getGrid(self, show_fruit = True):
         grid = np.zeros(shape=(self.size, self.size), dtype = np.int32)

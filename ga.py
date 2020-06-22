@@ -7,17 +7,19 @@ from game import Game
 from tqdm import tqdm
 from time import sleep
 
-POP_SIZE = 500
-ITERATIONS = 10000
+INPUT_SIZE = 24
 MUT_CHANCE = 0.05
 ETA = 50
+ITERATIONS = 10000
+POP_SIZE = 500
+MOVE_LIMIT = 100
 
 # print(random())
 
 def createNN():
     # 12 X 20 X 12 X 4 feed forward neural network
     network = NeuralNetwork()
-    network.addLayer(Dense(12, 20))
+    network.addLayer(Dense(INPUT_SIZE, 20))
     network.addLayer(ReLU())
     network.addLayer(Dense(20, 12))
     network.addLayer(ReLU())
@@ -66,7 +68,7 @@ def gen(population):
         nn = population[i]
         game = Game()
 
-        while not game.isFinished() and game.getMoves() < 100:
+        while not game.isFinished() and game.getMoves() < MOVE_LIMIT:
             state = game.getState()
             output = nn.calculate(state)[0]
 
@@ -86,8 +88,8 @@ def gen(population):
             game.step(ACTIONS[move])
             # game.printGrid()
 
-        # print(game.getPoints())
-        rank[i][0] = int(game.getPoints())
+        # print(game.getReward())
+        rank[i][0] = int(game.getReward())
         rank[i][1] = i
 
     # rank.sort(key = lambda x: -x[0])
