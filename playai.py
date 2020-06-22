@@ -4,11 +4,10 @@ from time import sleep
 from utils import ACTIONS, MOVES_DICT
 
 nn = None
-nn = pickle.load(open("ai.pickle", "rb"))
 
 try:
     dir = input("Enter AI pickle file: \n")
-    nn.pickle.load(open(dir, "rb"))
+    nn = pickle.load(open(dir, "rb"))
 except:
     print("error opening file")
 
@@ -18,7 +17,6 @@ game.printGrid()
 while not game.isFinished():
     state = game.getState()
     output = nn.calculate(state)[0]
-
 
     assert(len(output) == 4)
 
