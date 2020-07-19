@@ -28,6 +28,9 @@ class Dense(Layer):
     def isWeighted(self):
         return True
 
+    def getDimensions(self):
+        return input_units, output_units
+
     def getWeights(self):
         return self.weights
 
@@ -41,9 +44,6 @@ class Dense(Layer):
     def setBias(self, bias):
         assert(bias.shape == self.bias.shape)
         self.bias = bias
-
-    def getDimensions(self):
-        return input_units, output_units
 
 class ReLU(Layer):
     # ReLU activation unit
@@ -67,6 +67,25 @@ class Sigmoid(Layer):
 
     def forward(self, input):
         return 1.0/(1.0 + np.exp(-input))
+
+    def isWeighted(self):
+        return False
+
+    def getDimensions(self):
+        return 1, 1
+
+class Softmax(Layer):
+    # Sigmoid activation unit
+    def __init__(self):
+        pass
+
+    def forward(self, input):
+        input /= np.max(np.abs(input))
+        exp = np.exp(input)
+        sum = np.sum(exp)
+        if sum == 0:
+            sum += 1e9
+        return exp/sum
 
     def isWeighted(self):
         return False

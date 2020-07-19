@@ -2,7 +2,7 @@ import pickle
 import random
 import numpy as np
 from utils import GRID_SIZE, ACTIONS, MOVES_DICT
-from nn import NeuralNetwork, Dense, ReLU, Sigmoid
+from nn import NeuralNetwork, Dense, ReLU, Sigmoid, Softmax
 from game import Game
 from tqdm import tqdm
 from time import sleep
@@ -24,7 +24,7 @@ def createNN():
     network.addLayer(Dense(20, 12))
     network.addLayer(ReLU())
     network.addLayer(Dense(12, 4))
-    network.addLayer(Sigmoid())
+    network.addLayer(Softmax())
     return network
 
 def crossover(matrix1, matrix2):
@@ -63,19 +63,21 @@ def selection(rank):
 
 def gen(population):
     # Generates new population
-    rank = [[None, None] for i in range(POP_SIZE)]
+    rank = [[None, None, None] for i in range(POP_SIZE)]
     for i in range(POP_SIZE):
         nn = population[i]
         game = Game()
 
+        # Game loop
         while not game.isFinished() and game.getMoves() < MOVE_LIMIT:
             state = game.getState()
             output = nn.calculate(state)[0]
 
             assert(len(output) == 4)
 
-            maior = -1000000000
-            move = -1
+            # Chooses move with higher probability
+            maior = output[0]
+            move = 0
             for j in range(len(output)):
                 val = output[j]
                 if val > maior:
@@ -88,13 +90,12 @@ def gen(population):
             game.step(ACTIONS[move])
             # game.printGrid()
 
-        # print(game.getReward())
-        rank[i][0] = int(game.getReward())
-        rank[i][1] = i
+        rank[i][0] = int(game.getReward())  # reward
+        rank[i][1] = i                      # original index
+        rank[i][2] = int(game.getPoints())  # fruits eaten
 
-    # rank.sort(key = lambda x: -x[0])
-    # for element in rank:
-        # print("{} -> {}".format(element[0], element[1]))
+    rank.sort(key = lambda x: x[0], reverse = True)
+
     new_population = [None for x in range(POP_SIZE)]
     # crossover
     for i in range(0,POP_SIZE)[::2]:
@@ -127,7 +128,7 @@ def gen(population):
             new_l.setWeights(new_weight)
             new_l.setBias(new_bias)
 
-    return new_population, rank[0][0], population[rank[0][1]]
+    return new_population, rank[0][0], rank[0][2], population[rank[0][1]]
 
 
 def geneticAlgo():
@@ -137,11 +138,11 @@ def geneticAlgo():
         population.append(network)
 
     for i in tqdm(range(ITERATIONS)):
-        population, best_score, best = gen(population)
+        population, best_reward, best_points, best = gen(population)
         if(i%100 == 0):
-            print("best of {} is {}".format(i, best_score))
+            print("best of {} has {} reward and {} points".format(i, best_reward, best_points))
             name = "saved/best-{}.pickle".format(i)
-            with open(name, "wb") as f:
+            with open(name, "wb+") as f:
                 pickle.dump(best, f)
 
 if __name__ == "__main__":

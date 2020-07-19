@@ -20,8 +20,8 @@ while not game.isFinished():
 
     assert(len(output) == 4)
 
-    maior = -1000000000
-    move = -1
+    maior = output[0]
+    move = 0
     for j in range(len(output)):
         val = output[j]
         if val > maior:
