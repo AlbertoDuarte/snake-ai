@@ -12,12 +12,11 @@ MUT_CHANCE = 0.05
 ETA = 50
 ITERATIONS = 10000
 POP_SIZE = 500
-MOVE_LIMIT = 100
 
 # print(random())
 
 def createNN():
-    # 12 X 20 X 12 X 4 feed forward neural network
+    # 24 X 20 X 12 X 4 feed forward neural network
     network = NeuralNetwork()
     network.addLayer(Dense(INPUT_SIZE, 20))
     network.addLayer(ReLU())
@@ -67,9 +66,11 @@ def gen(population):
     for i in range(POP_SIZE):
         nn = population[i]
         game = Game()
+        points_last = 0
+        moves_without_points = 0
 
         # Game loop
-        while not game.isFinished() and game.getMoves() < MOVE_LIMIT:
+        while not game.isFinished() and moves_without_points < 2*(GRID_SIZE**2):
             state = game.getState()
             output = nn.calculate(state)[0]
 
@@ -88,7 +89,12 @@ def gen(population):
             move = MOVES_DICT[move]
 
             game.step(ACTIONS[move])
-            # game.printGrid()
+
+            if game.getPoints() == points_last:
+                moves_without_points += 1
+            else:
+                moves_without_points = 0
+                points_last = game.getPoints()
 
         rank[i][0] = int(game.getReward())  # reward
         rank[i][1] = i                      # original index

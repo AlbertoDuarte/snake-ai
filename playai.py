@@ -38,5 +38,8 @@ while not game.isFinished():
 
     sleep(0.35)
 
-print("You Lose!\nScore: {}".format(game.getPoints()))
+if game.getWin():
+    print("You win!")
+else:
+    print("You Lose!\nScore: {}".format(game.getPoints()))
 input()

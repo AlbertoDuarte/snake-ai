@@ -6,6 +6,7 @@ class Game(object):
     def __init__(self, seed = None):
         if(seed != None):
             random.seed(seed)
+        self.win = False
         self.moves = 0
         self.points = 0
         self.finished = False
@@ -26,13 +27,18 @@ class Game(object):
         self.head = list(prox)
         self.player.insert(0, list(prox))
         if (prox == self.fruit):
-            self.spawnFruit()
             self.points += 1
+            self.spawnFruit()
         else:
             self.player.pop()
 
 
     def spawnFruit(self):
+        if len(self.player) == self.size**2 :
+            finished = True
+            win = True
+            return None
+
         fruit = [random.randint(0, self.size-1), random.randint(0, self.size-1)]
         while(fruit in self.player):
             fruit = [random.randint(0, self.size-1), random.randint(0, self.size-1)]
@@ -83,7 +89,7 @@ class Game(object):
         print(state)
 
     def getReward(self):
-        return self.moves + 100*(self.points**2)
+        return self.moves + 100*(self.points**2) + int(self.win)* 200*(self.size**2)
 
     def getPoints(self):
         return self.points
@@ -99,6 +105,9 @@ class Game(object):
 
     def getMoves(self):
         return self.moves
+
+    def getWin(self):
+        return self.win
 
     def printGrid(self):
         clear()
